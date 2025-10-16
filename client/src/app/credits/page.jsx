@@ -53,8 +53,8 @@ function CreditsPage() {
   }, []);
   if (loading) return <Loader className="size-80 animate-spin " />;
   return (
-    <div className="max-w-7xl h-screen overflow-y-scroll mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <h2 className="text-3xl text-center font-semibold mb-10 text-gray-800 dark:text-white xl:mt-32">
+    <div className="max-w-7xl h-screen overflow-y-scroll mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 className="text-3xl text-center font-semibold mb-10 text-gray-800 dark:text-white xl:mt-10">
         Credit Plans
       </h2>
       <div className="flex flex-wrap justify-center gap-8">
@@ -82,7 +82,9 @@ function CreditsPage() {
                 ))}
               </ul>
             </div>
-            <button className="mt-6 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 rounded transition-colors cursor-pointer">Buy Now</button>
+            <button className="mt-6 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 rounded transition-colors cursor-pointer">
+              Buy Now
+            </button>
           </div>
         ))}
       </div>
