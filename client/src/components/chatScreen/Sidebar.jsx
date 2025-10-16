@@ -16,11 +16,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function Sidebar() {
-  const { chats, setSelectedChat, user } = useAppContext();
+  const { chats, setSelectedChat, user,router,createNew } = useAppContext();
   const [search, setSearch] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
+  const logOut=()=>{
+
+  }
   return (
     <>
       {!isMenuOpen && (

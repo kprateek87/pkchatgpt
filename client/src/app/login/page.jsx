@@ -1,6 +1,8 @@
 "use client";
+import { useAppContext } from "@/context/AppContext";
 import { Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 function LoginPage() {
   const [state, setState] = useState("login");
@@ -9,8 +11,22 @@ function LoginPage() {
     email: "",
     password: "",
   });
+  const { axios, setToken,router } = useAppContext();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const url = state == "login" ? "/api/user/login" : "/api/user/register";
+    try {
+      const { data } = await axios.post(url, {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      if (data.success) {
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
+        router.replace('/')
+      } else toast.error(data.message);
+    } catch (e) {toast.error(e.message);}
   };
   const handleChange = (e) => {
     const { name, value } = e.target;

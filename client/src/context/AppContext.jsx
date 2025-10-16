@@ -1,91 +1,65 @@
 "use client";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_URL;
 const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [user, setUser] = useState(null);
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [token, setToken] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken || null);
+    }
+  }, []); 
+
   const fetchUser = async () => {
-    setUser({
-      name: "Prateek",
-      email: "kprateek787@gmail.com",
-      password: "Abc@123",
-      _id: "1234asdfqwerty",
-      credits: 200,
-    });
-    setLoading(false);
+    try {
+      const { data } = await axios.get("/api/user/data", {
+        headers: { Authorization: token },
+      });
+      if (data.success) setUser(data.user);
+      else toast.error(data.message);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+  const createNewChat = async () => {
+    try {
+      if (!user) return toast("Login/Signup For create Chats");
+      router.replace("/");
+      await axios.get("/api/c/create", { headers: { Authorization: token } });
+    } catch (e) {
+      toast.error(e.message);
+    }
+    await fetchUserChats();
   };
   const fetchUserChats = async () => {
-    setChats([
-      {
-        name: "New chats",
-        userName: "Prateek",
-        email: "kprateek787@gmail.com",
-        password: "Abc@123",
-        _id: "689de4bbaa932dc3a8ef6cd7",
-        userId: "1234asdfqwerty",
-        messages: [
-          {
-            isImage: false,
-            isPublished: false,
-            role: "user",
-            content: "hello",
-            timestamp: 1755178179612,
-          },
-          {
-            isImage: false,
-            isPublished: false,
-            role: "assistant",
-            content: "Hello! 😊 How can I assist you today?",
-            timestamp: 1755106420723,
-          },
-          {
-            isImage: false,
-            isPublished: false,
-            role: "user",
-            content: "Generate a image of boy talking with others",
-            timestamp: 1755107475040,
-          },
-        ],
-        createdAt: "2025-08-14T13:29:31.398Z",
-        updatedAt: "2025-08-14T13:29:54.753Z",
-      },
-    ]);
-    setSelectedChat({
-      name: "New chats",
-      userName: "Prateek",
-      email: "kprateek787@gmail.com",
-      password: "Abc@123",
-      _id: "689de4bbaa932dc3a8ef6cd7",
-      userId: "1234asdfqwerty",
-      messages: [
-        {
-          isImage: false,
-          isPublished: false,
-          role: "user",
-          content: "hello",
-          timestamp: 1755178179612,
-        },
-        {
-          isImage: false,
-          isPublished: false,
-          role: "assistant",
-          content: "Hello! 😊 How can I assist you today?",
-          timestamp: 1755106420723,
-        },
-        {
-          isImage: false,
-          isPublished: false,
-          role: "user",
-          content: "Generate a image of boy talking with others",
-          timestamp: 1755107475040,
-        },
-      ],
-      createdAt: "2025-08-14T13:29:31.398Z",
-      updatedAt: "2025-08-14T13:29:54.753Z",
-    });
+    try {
+      const { data } = axios.get("/api/c/get", {
+        headers: { Authorization: token },
+      });
+      if (data.success) {
+        setChats(data.chats);
+        if (data.chats.length === 0) {
+          await createNewChat();
+          return fetchUserChats();
+        } else setSelectedChat(data.chats[0]);
+      } else toast.error(data.message);
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
   useEffect(() => {
     if (user) fetchUserChats();
@@ -95,8 +69,12 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [user]);
   useEffect(() => {
-    fetchUser();
-  }, []);
+    if (token) fetchUser();
+    else {
+      setUser(null);
+      setLoadingUser(false);
+    }
+  }, [token]);
 
   const value = {
     user,
@@ -108,6 +86,9 @@ export const AppContextProvider = ({ children }) => {
     setSelectedChat,
     loading,
     setLoading,
+    createNewChat,
+    loadingUser,
+    fetchUserChats,token,setToken,axios,router
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
