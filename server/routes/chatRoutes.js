@@ -4,11 +4,13 @@ import {
   createChat,
   deleteChat,
   getAllChats,
+  getChatById,
 } from "../controller/chatController.js";
-const chatRouter = Router();
 
+const chatRouter = Router();
 chatRouter.post("/create", protect, createChat);
 chatRouter.get("/get", protect, getAllChats);
-chatRouter.delete("/delete", protect, deleteChat);
+chatRouter.get("/:chatId", protect, getChatById); // Dynamic route for individual chat
+chatRouter.delete("/:chatId", protect, deleteChat); // Dynamic route for deleting specific chat
 
 export default chatRouter;

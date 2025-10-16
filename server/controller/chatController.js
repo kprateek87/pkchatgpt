@@ -26,11 +26,32 @@ export const getAllChats = async (req, res) => {
   }
 };
 
+export const getChatById = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { chatId } = req.params; // Get chatId from URL params
+    const chat = await Chat.findOne({ _id: chatId, userId });
+
+    if (!chat) {
+      return res.status(404).json({ success: false, message: "Chat not found" });
+    }
+
+    res.json({ success: true, chat });
+  } catch (e) {
+    return res.json({ success: false, message: e.message });
+  }
+};
+
 export const deleteChat = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { chatId } = req.body;
-    await Chat.deleteOne({ _id: chatId, userId });
+    const { chatId } = req.params; // Get chatId from URL params
+    const chat = await Chat.findOneAndDelete({ _id: chatId, userId });
+
+    if (!chat) {
+      return res.status(404).json({ success: false, message: "Chat not found" });
+    }
+
     res.json({ success: true, message: "Chat Deleted" });
   } catch (e) {
     return res.json({ success: false, message: e.message });

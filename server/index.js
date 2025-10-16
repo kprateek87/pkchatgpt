@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRouter);
 app.use("/api/c", chatRouter);
-app.use("/api/c", messageRouter);
+app.use("/api/c/:chatId/messages", messageRouter);
 app.use("/api/credit", creditsRouter);
 
 app.get("/", (req, res) => res.send("server is live"));

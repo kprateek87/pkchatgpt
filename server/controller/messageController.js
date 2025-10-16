@@ -5,13 +5,20 @@ import User from "../models/User.js";
 export const textMessageController = async (req, res) => {
   try {
     const userId = req.user._id;
-    if (req.user.credits < 2)
+    if (req.user.credits < 2) {
       return res.json({
         success: false,
-        mesage: "You don't have enough  credits to use this feature",
+        message: "You don't have enough credits to use this feature",
       });
+    }
     const { chatId, prompt } = req.body;
     const chat = await Chat.findOne({ userId, _id: chatId });
+    if (!chat) {
+      return res.json({
+        success: false,
+        message: "Chat not found",
+      });
+    }
     chat.messages.push({
       role: "user",
       content: prompt,
@@ -27,13 +34,12 @@ export const textMessageController = async (req, res) => {
       ],
     });
     const reply = { ...choices[0].message, timestamp: Date.now() };
-    res.json({ success: true, reply });
-    chat.message.push(reply);
+    chat.messages.push(reply);
     await chat.save();
     await User.updateOne({ _id: userId }, { $inc: { credits: -1 } });
+    res.json({ success: true, reply });
   } catch (e) {
-    res.json({ success: false, mesage: e.mesage });
+    console.error(e);
+    res.json({ success: false, message: e.message || "An error occurred" });
   }
 };
-
-console.log(response.choices[0].message);

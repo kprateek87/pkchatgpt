@@ -4,6 +4,6 @@ import { textMessageController } from "../controller/messageController.js";
 
 const messageRouter = Router();
 
-messageRouter.post("/text", protect, textMessageController);
+messageRouter.post("/:chatId", protect, textMessageController); // Dynamic route for sending messages to specific chat
 
 export default messageRouter;
