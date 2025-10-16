@@ -33,7 +33,7 @@ function LoginPage() {
               type="text"
               name="name"
               placeholder="Name"
-              className="border-none outline-none ring-0"
+              className="border-none outline-none ring-0 text-black"
               value={formData.name}
               onChange={handleChange}
               required
@@ -46,7 +46,7 @@ function LoginPage() {
             type="email"
             name="email"
             placeholder="Email id"
-            className="border-none outline-none ring-0"
+            className="border-none outline-none ring-0 text-black"
             value={formData.email}
             onChange={handleChange}
             required
@@ -58,7 +58,7 @@ function LoginPage() {
             type="password"
             name="password"
             placeholder="Password"
-            className="border-none outline-none ring-0"
+            className="border-none outline-none ring-0 text-black"
             value={formData.password}
             onChange={handleChange}
             required

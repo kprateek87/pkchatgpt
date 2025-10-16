@@ -3,6 +3,7 @@
 import { useAppContext } from "@/context/AppContext";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Sidebar from "../chatScreen/Sidebar";
 
 function AuthProtector({ children }) {
   const router = useRouter();
@@ -19,7 +20,16 @@ function AuthProtector({ children }) {
 
   if (loading) return <div>Loading...</div>;
 
-  return <>{children}</>;
+  return (
+    <>
+      <div className="dark:bg-gradient-to-b dark:from-[#242124] dark:to-[#000]">
+        <div className="flex h-screen">
+          {pathname !== "/login" && <Sidebar />}
+          {children}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default AuthProtector;
