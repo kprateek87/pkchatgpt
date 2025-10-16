@@ -15,52 +15,69 @@ export const AppContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const storedToken = localStorage.getItem("token");
-      setToken(storedToken || null);
-    }
-  }, []); 
-
   const fetchUser = async () => {
     try {
       const { data } = await axios.get("/api/user/data", {
         headers: { Authorization: token },
       });
       if (data.success) setUser(data.user);
-      else toast.error(data.message);
+      else console.error(data.message);
     } catch (e) {
-      toast.error(e.message);
+      console.error(e);
     } finally {
       setLoadingUser(false);
     }
   };
-  const createNewChat = async () => {
-    try {
-      if (!user) return toast("Login/Signup For create Chats");
-      router.replace("/");
-      await axios.get("/api/c/create", { headers: { Authorization: token } });
-    } catch (e) {
-      toast.error(e.message);
+const createNewChat = async () => {
+  try {
+    if (!user) {
+      toast.error("Login/Signup to create chats");
+      return;
     }
-    await fetchUserChats();
-  };
-  const fetchUserChats = async () => {
-    try {
-      const { data } = axios.get("/api/c/get", {
-        headers: { Authorization: token },
-      });
-      if (data.success) {
+
+    const { data } = await axios.get("/api/c/create", {
+      headers: { Authorization: token },
+    });
+
+    if (!data.success) {
+      toast.error(data.message || "Failed to create chat");
+    }
+  } catch (e) {
+    console.error(e);
+    toast.error("An error occurred while creating chat");
+  }
+};
+
+const fetchUserChats = async () => {
+  try {
+    const { data } = await axios.get("/api/c/get", {
+      headers: { Authorization: token },
+    });
+
+    if (data.success) {
+      if (data.chats.length === 0) {
+        await createNewChat();
+
+        const refreshed = await axios.get("/api/c/get", {
+          headers: { Authorization: token },
+        });
+
+        if (refreshed.data.success) {
+          setChats(refreshed.data.chats);
+          setSelectedChat(refreshed.data.chats[0] || null);
+        }
+      } else {
         setChats(data.chats);
-        if (data.chats.length === 0) {
-          await createNewChat();
-          return fetchUserChats();
-        } else setSelectedChat(data.chats[0]);
-      } else toast.error(data.message);
-    } catch (e) {
-      toast.error(e.message);
+        setSelectedChat(data.chats[0]);
+      }
+    } else {
+      toast.error(data.message || "Failed to fetch chats");
     }
-  };
+  } catch (e) {
+    console.error(e);
+    toast.error("An error occurred while fetching chats");
+  }
+};
   useEffect(() => {
     if (user) fetchUserChats();
     else {
@@ -77,6 +94,9 @@ export const AppContextProvider = ({ children }) => {
   }, [token]);
 
   const value = {
+    loading,
+    setLoading,
+    router,
     user,
     setUser,
     fetchUser,
@@ -84,11 +104,12 @@ export const AppContextProvider = ({ children }) => {
     setChats,
     selectedChat,
     setSelectedChat,
-    loading,
-    setLoading,
     createNewChat,
     loadingUser,
-    fetchUserChats,token,setToken,axios,router
+    fetchUserChats,
+    token,
+    setToken,
+    axios,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

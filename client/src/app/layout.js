@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthProtector from "@/components/login/AuthProtector";
 import { AppContextProvider } from "@/context/AppContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,10 @@ export default function RootLayout({ children }) {
       >
         <div className="dark:bg-gradient-to-b dark:from-[#242124] dark:to-[#000]">
           <AppContextProvider>
-            <AuthProtector>{children}</AuthProtector>
+            <AuthProtector>
+              <Toaster />
+              {children}
+            </AuthProtector>
           </AppContextProvider>
         </div>
       </body>

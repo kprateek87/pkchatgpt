@@ -1,17 +1,18 @@
 "use client";
 import { useAppContext } from "@/context/AppContext";
-import { Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 function LoginPage() {
   const [state, setState] = useState("login");
+  const [password, setPassword] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const { axios, setToken,router } = useAppContext();
+  const { axios, setToken, router } = useAppContext();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = state == "login" ? "/api/user/login" : "/api/user/register";
@@ -23,10 +24,11 @@ function LoginPage() {
       });
       if (data.success) {
         setToken(data.token);
-        localStorage.setItem("token", data.token);
-        router.replace('/')
-      } else toast.error(data.message);
-    } catch (e) {toast.error(e.message);}
+        router.replace("/");
+      } else console.error(data.message);
+    } catch (e) {
+      console.error(e);
+    }
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,15 +72,24 @@ function LoginPage() {
         </div>
         <div className="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-6 gap-2">
           <Lock className="size-4 text-black" />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="border-none outline-none ring-0 text-black"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="flex justify-between items-center">
+            <input
+              type={`${password ? "password" : "text"}`}
+              name="password"
+              placeholder="Password"
+              className="border-none outline-none ring-0 text-black"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            <div onClick={() => setPassword(!password)}>
+              {password ? (
+                <Eye className="size-4 text-black" />
+              ) : (
+                <EyeOff className="size-4 text-black" />
+              )}
+            </div>
+          </div>
         </div>
         <div className="mt-4 text-left text-indigo-500">
           <button className="text-sm" type="reset">

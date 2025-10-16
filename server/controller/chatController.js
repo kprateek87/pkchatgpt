@@ -29,11 +29,13 @@ export const getAllChats = async (req, res) => {
 export const getChatById = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { chatId } = req.params; // Get chatId from URL params
+    const { chatId } = req.params;
     const chat = await Chat.findOne({ _id: chatId, userId });
 
     if (!chat) {
-      return res.status(404).json({ success: false, message: "Chat not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Chat not found" });
     }
 
     res.json({ success: true, chat });
