@@ -12,17 +12,54 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 function Sidebar() {
-  const { chats, setSelectedChat, user,router,createNew } = useAppContext();
+  const {
+    chats,
+    setSelectedChat,
+    user,
+    router,
+    createNewChat,
+    axios,
+    setChats,
+    fetchUsersChats,
+    setToken,
+    token,
+  } = useAppContext();
   const [search, setSearch] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const logOut=()=>{
+  const logOut = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    toast.success("Logged out Successfully");
+  };
+  const deleteChat = async (e, chatId) => {
+    try {
+      e.stopPropagation();
+      const confirm = window.confirm(
+        "Are you sure you want to delete this chat?"
+      );
+      if (!confirm) return;
+      else {
+        const { data } = axios.post(
+          "/api/c/delete",
+          { chatId },
+          { headers: { Authorization: token } }
+        );
+        if (data.success) {
+          setChats((prev) => prev.filter((chat) => chat._id !== chatId));
+          await fetchUsersChats();
+          toast.success(data.message);
+        }
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
-  }
   return (
     <>
       {!isMenuOpen && (
@@ -38,7 +75,10 @@ function Sidebar() {
       >
         <h1 className="text-xl font-bold w-full max-w-48">PkChatGPT</h1>
 
-        <button className="flex justify-center items-center w-full py-2 mt-10 dark:text-white dark:bg-gradient-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer ">
+        <button
+          onClick={createNewChat}
+          className="flex justify-center items-center w-full py-2 mt-10 dark:text-white dark:bg-gradient-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer "
+        >
           <span className="mr-2 text-xl">+</span> New Chat
         </button>
         <div className="flex items-center gap-2 p-3 mt-4 border-gray-400 dark:border-white/30 rounded-md">
@@ -80,7 +120,14 @@ function Sidebar() {
                     {moment(chat.updatedAt).fromNow()}
                   </p>
                 </div>
-                <Trash2 className="hidden group-hover:block cursor-pointer" />
+                <Trash2
+                  className="hidden group-hover:block cursor-pointer"
+                  onClick={(e) =>
+                    toast.promise(deleteChat(e, chat._id), {
+                      loading: "loding...",
+                    })
+                  }
+                />
               </div>
             ))}
         </div>
@@ -121,7 +168,10 @@ function Sidebar() {
             {user ? user.name : "Login Your Account"}
           </p>
           {user && (
-            <LogOut className="cursor-pointer size-5 hidden group-hover:block" />
+            <LogOut
+              className="cursor-pointer size-5 hidden group-hover:block"
+              onClick={logOut}
+            />
           )}
         </div>
         <CircleX

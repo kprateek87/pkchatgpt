@@ -78,6 +78,11 @@ const fetchUserChats = async () => {
     toast.error("An error occurred while fetching chats");
   }
 };
+
+  useEffect(() => {
+    const item = localStorage.getItem("token");
+    setToken(item);
+  }, []);
   useEffect(() => {
     if (user) fetchUserChats();
     else {

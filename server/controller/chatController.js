@@ -47,8 +47,8 @@ export const getChatById = async (req, res) => {
 export const deleteChat = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { chatId } = req.params; // Get chatId from URL params
-    const chat = await Chat.findOneAndDelete({ _id: chatId, userId });
+    const { chatId } = req.body;
+    const chat = await Chat.deleteOne({ _id: chatId, userId });
 
     if (!chat) {
       return res.status(404).json({ success: false, message: "Chat not found" });

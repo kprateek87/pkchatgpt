@@ -11,6 +11,6 @@ const chatRouter = Router();
 chatRouter.get("/create", protect, createChat);
 chatRouter.get("/get", protect, getAllChats);
 // chatRouter.get("/:chatId", protect, getChatById);
-// chatRouter.delete("/:chatId", protect, deleteChat); 
+chatRouter.post("/delete", protect, deleteChat); 
 
 export default chatRouter;

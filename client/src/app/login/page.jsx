@@ -1,6 +1,7 @@
 "use client";
 import { useAppContext } from "@/context/AppContext";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -12,7 +13,8 @@ function LoginPage() {
     email: "",
     password: "",
   });
-  const { axios, setToken, router } = useAppContext();
+  const router = useRouter();
+  const { axios, setToken } = useAppContext();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = state == "login" ? "/api/user/login" : "/api/user/register";
